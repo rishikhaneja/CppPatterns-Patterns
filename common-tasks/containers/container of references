@@ -1,0 +1,67 @@
+// Container of references
+// C++11
+
+#include <vector>
+#include <functional>
+
+class drawable
+{
+  public:
+    virtual void draw() = 0;
+};
+
+class concrete_drawable : public drawable
+{
+  public:
+    virtual void draw() override
+    { }
+};
+
+class display
+{
+  public:
+    void register(drawable& o)
+    {
+      drawables.push_back(o);
+    }
+
+    void draw()
+    {
+      for (drawable& o : drawables) {
+        o.draw();
+      }
+    }
+
+  private:
+    std::vector<std::reference_wrapper<drawable>> drawables;
+};
+
+// Hold references in standard container
+//
+// Standard containers require the element type to be assignable
+// which reference types are not.
+// [`std::reference_wrapper`](cpp/utility/functional/reference_wrapper) ([36])
+// allows overcoming this restriction.
+//
+// Furthermore this allows storing derived type objects
+// in base form, without resorting to pointers,
+// and thus allowing polymorphism through virtual calls.
+//
+// The `display` class, defined on [20-37], contains a
+// [`std::vector`](cpp/container/vector) of references to drawables [36].
+// Drawables are objects of any class derived from 'drawable' that
+// implements the `draw` interface ([7-11]). The
+// `register` function ([23-26]) adds drawables
+// to this `std::vector`, which can all then be drawn in their specific way by the
+// `draw` function ([28-33]).
+
+int main()
+{
+  display d;
+
+  observer_drawable o1, o2;
+  d.register(o1);
+  d.register(o2);
+
+  d.draw();
+}
